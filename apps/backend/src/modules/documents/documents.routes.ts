@@ -24,12 +24,12 @@ router.get('/export.:format', async (req, res, next) => {
     res.setHeader('Cache-Control', 'private, no-store');
     if (format === 'xlsx') {
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', `attachment; filename="orbit-erp-${date}.xlsx"`);
+      res.setHeader('Content-Disposition', `attachment; filename="nodara-erp-${date}.xlsx"`);
       await streamTenantWorkbook(payload.tenantId, res);
       return;
     }
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="orbit-erp-${date}.pdf"`);
+    res.setHeader('Content-Disposition', `attachment; filename="nodara-erp-${date}.pdf"`);
     await streamTenantPdf(payload.tenantId, res);
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError || error instanceof jwt.TokenExpiredError) return next(new AppError(401, 'El enlace de exportación venció o no es válido.'));
@@ -62,10 +62,10 @@ router.get('/invoices/:id', async (req, res, next) => {
     res.setHeader('Content-Disposition', `inline; filename="factura-${safeNumber}.pdf"`);
     res.setHeader('Cache-Control', 'private, no-store');
 
-    const doc = new PDFDocument({ size: 'A4', margin: 50, info: { Title: `Factura ${invoice.number}`, Author: 'Orbit ERP' } });
+    const doc = new PDFDocument({ size: 'A4', margin: 50, info: { Title: `Factura ${invoice.number}`, Author: 'Nodara ERP' } });
     doc.pipe(res);
 
-    doc.fillColor('#1557C8').fontSize(25).text('ORBIT ERP');
+    doc.fillColor('#1557C8').fontSize(25).text('NODARA ERP');
     doc.fillColor('#52617A').fontSize(10).text(tenant?.name ?? 'Empresa');
     doc.moveDown(1.5);
     doc.fillColor('#111827').fontSize(20).text(`Factura ${invoice.number}`);
@@ -109,7 +109,7 @@ router.get('/invoices/:id', async (req, res, next) => {
     doc.text(`Impuestos: ${currency.format(invoice.impuestos)}`, { align: 'right' });
     doc.fillColor('#111827').fontSize(14).text(`Total: ${currency.format(invoice.total)}`, { align: 'right' });
     doc.moveDown(2);
-    doc.fillColor('#52617A').fontSize(8).text('Documento generado por Orbit ERP.', { align: 'center' });
+    doc.fillColor('#52617A').fontSize(8).text('Documento generado por Nodara ERP.', { align: 'center' });
     doc.end();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError || error instanceof jwt.TokenExpiredError) {

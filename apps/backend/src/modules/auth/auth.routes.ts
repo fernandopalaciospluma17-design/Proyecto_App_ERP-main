@@ -92,7 +92,7 @@ router.get('/verify-email', async (req, res, next) => {
     }).select('+verificationTokenHash +verificationExpiresAt');
 
     if (!user) {
-      res.status(400).send(verificationPage('Enlace vencido o utilizado', 'Solicita un nuevo correo de confirmación desde Orbit ERP.', false));
+      res.status(400).send(verificationPage('Enlace vencido o utilizado', 'Solicita un nuevo correo de confirmación desde Nodara.', false));
       return;
     }
 
@@ -207,4 +207,3 @@ function verificationPage(title: string, message: string, success: boolean) {
 }
 
 export default router;
-

@@ -38,11 +38,11 @@ function styleSheet(sheet: ExcelJS.Worksheet) {
 export async function streamTenantWorkbook(tenantId: string, res: Response) {
   const data = await getExportData(tenantId);
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = 'Orbit ERP';
+  workbook.creator = 'Nodara ERP';
   workbook.created = new Date();
   const summary = workbook.addWorksheet('Resumen');
   summary.addRows([
-    ['Orbit ERP - Exportación de datos', data.company],
+    ['Nodara ERP - Exportación de datos', data.company],
     ['Fecha de exportación', new Date()],
     ['Productos', data.products.length],
     ['Contactos', data.contacts.length],
@@ -84,7 +84,7 @@ export async function streamTenantWorkbook(tenantId: string, res: Response) {
 
 export async function streamTenantPdf(tenantId: string, res: Response) {
   const data = await getExportData(tenantId);
-  const doc = new PDFDocument({ size: 'A4', margin: 44, info: { Title: `Reporte Orbit ERP - ${data.company}`, Author: 'Orbit ERP' } });
+  const doc = new PDFDocument({ size: 'A4', margin: 44, info: { Title: `Reporte Nodara ERP - ${data.company}`, Author: 'Nodara ERP' } });
   doc.pipe(res);
   const ensureSpace = (height = 50) => { if (doc.y + height > 770) doc.addPage(); };
   const title = (value: string) => { ensureSpace(45); doc.moveDown().fillColor('#1557C8').fontSize(15).text(value); doc.moveDown(0.4); };
@@ -99,7 +99,7 @@ export async function streamTenantPdf(tenantId: string, res: Response) {
     if (!header) doc.moveTo(44, doc.y - 3).lineTo(551, doc.y - 3).strokeColor('#D8DFEA').stroke();
   };
 
-  doc.fillColor('#1557C8').fontSize(24).text('ORBIT ERP');
+  doc.fillColor('#1557C8').fontSize(24).text('NODARA ERP');
   doc.fillColor('#111827').fontSize(18).text(data.company);
   doc.fillColor('#52617A').fontSize(9).text(`Exportación generada el ${new Date().toLocaleString('es-MX')}`);
   title('Resumen');

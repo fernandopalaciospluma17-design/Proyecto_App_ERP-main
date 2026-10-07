@@ -52,13 +52,13 @@ export async function sendVerificationEmail(input: { email: string; name: string
 
   await sendEmail({
     to: input.email,
-    subject: 'Confirma tu cuenta de Orbit ERP',
+    subject: 'Confirma tu cuenta de Nodara',
     idempotencyKey: `verify-email/${input.email}/${input.token.slice(0, 16)}`,
     html: `
       <div style="background:#050b18;padding:32px;font-family:Arial,sans-serif;color:#f5f7fb">
         <div style="max-width:560px;margin:auto;background:#0d1830;border:1px solid #1f3764;border-radius:20px;padding:32px">
           <h1 style="margin:0 0 16px;color:#4ca6ff">Confirma tu cuenta</h1>
-          <p>Hola ${safeName}, gracias por registrarte en Orbit ERP.</p>
+          <p>Hola ${safeName}, gracias por registrarte en Nodara.</p>
           <p>Confirma tu correo para activar el inicio de sesión. El enlace vence en ${env.EMAIL_VERIFICATION_TTL_MINUTES} minutos.</p>
           <p style="margin:28px 0"><a href="${confirmationUrl}" style="background:#2f80ff;color:white;text-decoration:none;padding:14px 22px;border-radius:12px;font-weight:bold">Confirmar mi correo</a></p>
           <p style="font-size:12px;color:#8c9ab5">Si no creaste esta cuenta, puedes ignorar este mensaje.</p>
@@ -71,16 +71,15 @@ export async function sendWelcomeEmail(input: { email: string; name: string; use
   const safeName = escapeHtml(input.name);
   await sendEmail({
     to: input.email,
-    subject: 'Bienvenido a Orbit ERP',
+    subject: 'Bienvenido a Nodara',
     idempotencyKey: `welcome-user/${input.userId}`,
     html: `
       <div style="background:#050b18;padding:32px;font-family:Arial,sans-serif;color:#f5f7fb">
         <div style="max-width:560px;margin:auto;background:#0d1830;border:1px solid #1f3764;border-radius:20px;padding:32px">
-          <h1 style="margin:0 0 16px;color:#4ca6ff">Bienvenido a Orbit ERP</h1>
+          <h1 style="margin:0 0 16px;color:#4ca6ff">Bienvenido a Nodara</h1>
           <p>Hola ${safeName}, tu correo fue confirmado correctamente.</p>
           <p>Ya puedes iniciar sesión desde la aplicación Android o desde la página web.</p>
         </div>
       </div>`
   });
 }
-

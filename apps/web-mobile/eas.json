@@ -6,7 +6,7 @@
     "apk": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://orbit-erp-api-p9vp.onrender.com/api"
+        "EXPO_PUBLIC_API_URL": "https://proyecto-app-erp-main.onrender.com"
       },
       "android": {
         "buildType": "apk"
@@ -15,7 +15,7 @@
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://orbit-erp-api-p9vp.onrender.com/api"
+        "EXPO_PUBLIC_API_URL": "https://proyecto-app-erp-main.onrender.com"
       },
       "android": {
         "buildType": "apk"
@@ -24,7 +24,7 @@
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://orbit-erp-api-p9vp.onrender.com/api"
+        "EXPO_PUBLIC_API_URL": "https://proyecto-app-erp-main.onrender.com"
       }
     }
   }

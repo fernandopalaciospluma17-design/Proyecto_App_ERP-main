@@ -1,4 +1,4 @@
-# Orbit ERP
+# Nodara ERP
 
 ERP multiplataforma con una API Express y MongoDB Atlas, contratos Zod compartidos y una aplicacion Expo para Android y web.
 
@@ -59,6 +59,14 @@ npx eas-cli@latest build -p android --profile production
 ```
 
 Para produccion, configura `EXPO_PUBLIC_API_URL` con una URL HTTPS publica de la API. No incrustes `MONGODB_URI` ni `JWT_SECRET` en la aplicacion movil: solo pertenecen al servidor.
+
+## Despliegue de produccion
+
+La configuracion de Render esta en `render.yaml`; compila los contratos y el backend desde la raiz del monorepo y utiliza `/health` como comprobacion de disponibilidad. Configura los secretos `MONGODB_URI`, `JWT_SECRET` y `RESEND_API_KEY` directamente en Render.
+
+La API publica configurada para produccion es `https://proyecto-app-erp-main.onrender.com`. `PUBLIC_API_URL` debe contener esa URL sin `/api`; Render tambien limita `CORS_ORIGINS` al origen web `https://proyecto-app-erp-main.fernandopalaciospluma17.workers.dev`. El remitente de verificacion es `Nodara <onboarding@resend.dev>`.
+
+Cloudflare Pages usa el build `corepack pnpm install --frozen-lockfile && corepack pnpm --filter @erp/contracts build && corepack pnpm --filter @erp/web-mobile build` y el directorio de salida `apps/web-mobile/dist`. Define `EXPO_PUBLIC_API_URL=https://proyecto-app-erp-main.onrender.com` como variable de build; el cliente añade `/api` si hace falta y consulta `/health` en la raiz del servicio.
 
 ## Verificacion
 

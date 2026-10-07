@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Nodara ERP",
-    "slug": "orbit-erp",
+    "slug": "nodara-erp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon-nodara.png",

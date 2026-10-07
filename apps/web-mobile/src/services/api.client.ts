@@ -1,7 +1,7 @@
 const configuredUrl = process.env.EXPO_PUBLIC_API_URL?.trim();
 
 export function getApiBaseUrl() {
-  const baseUrl = (configuredUrl || 'https://orbit-erp-api-p9vp.onrender.com').replace(/\/$/, '');
+  const baseUrl = (configuredUrl || 'https://proyecto-app-erp-main.onrender.com').replace(/\/$/, '');
 
   return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
 }
