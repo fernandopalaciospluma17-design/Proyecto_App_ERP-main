@@ -97,8 +97,6 @@ export function AuthScreen({ onAuthenticated }: { onAuthenticated: (session: Aut
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.root}>
-      <View style={styles.ambientTop} />
-      <View style={styles.ambientBottom} />
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <View style={[styles.layout, compact && styles.layoutCompact]}>
           {!compact ? (
