@@ -97,8 +97,7 @@ export function AuthScreen({ onAuthenticated }: { onAuthenticated: (session: Aut
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.root}>
-      <View style={styles.ambientTop} />
-      <View style={styles.ambientBottom} />
+
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <View style={[styles.layout, compact && styles.layoutCompact]}>
           {!compact ? (
@@ -205,11 +204,9 @@ function Message({ tone, text }: { tone: 'success' | 'error'; text: string }) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1, backgroundColor: colors.backgroundlogin },
   scrollView: { flex: 1 },
   scroll: { flexGrow: 1, justifyContent: 'center', padding: spacing.lg },
-  ambientTop: { position: 'absolute', width: 520, height: 520, borderRadius: 260, top: -330, right: 0, backgroundColor: colors.glow },
-  ambientBottom: { position: 'absolute', width: 430, height: 430, borderRadius: 215, bottom: -300, left: -170, backgroundColor: 'rgba(84, 112, 100, 0.1)' },
   layout: { width: '100%', maxWidth: 1080, alignSelf: 'center', flexDirection: 'row', alignItems: 'stretch', gap: spacing.xl },
   layoutCompact: { maxWidth: 480, flexDirection: 'column', gap: 0 },
   intro: { flex: 1, maxWidth: 590, minHeight: 560, justifyContent: 'center', padding: spacing.xl, borderRadius: radius.lg, backgroundColor: colors.ink, borderWidth: 1, borderColor: colors.sidebarBorder },
