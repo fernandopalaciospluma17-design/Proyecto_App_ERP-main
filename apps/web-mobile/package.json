@@ -1,0 +1,36 @@
+{
+  "name": "@erp/web-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "dev": "expo start",
+    "android": "expo start --android",
+    "web": "expo start --web",
+    "build": "expo export --platform web",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@erp/contracts": "workspace:*",
+    "@expo-google-fonts/ibm-plex-mono": "^0.4.1",
+    "@expo-google-fonts/inter": "^0.4.2",
+    "@expo-google-fonts/manrope": "^0.4.2",
+    "@expo/metro-runtime": "~57.0.16",
+    "expo": "~57.0.27",
+    "expo-font": "~57.0.4",
+    "expo-image": "~57.0.5",
+    "expo-image-picker": "~57.0.20",
+    "expo-secure-store": "~57.0.4",
+    "expo-splash-screen": "~57.0.9",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-web": "~0.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/react": "~19.2.0",
+    "typescript": "^6.0.3"
+  }
+}

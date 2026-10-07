@@ -1,0 +1,165 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { useFonts } from 'expo-font';
+import { ActivityIndicator, Platform, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { AppShell, type ScreenKey } from './components/AppShell';
+import { CommandPalette } from './components/CommandPalette';
+import { ScreenTransition } from './components/ui';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { AuthScreen } from './screens/AuthScreen';
+import { ActivityScreen, ContactsScreen, DashboardScreen, FinanceScreen, InventoryScreen, ProfileScreen, ProjectsScreen, PurchasesScreen, ReportsScreen, SalesScreen, StorefrontScreen, TeamScreen } from './screens/Screens';
+import { getApiBaseUrl, pingApi } from './services/api.client';
+import { AuthApiError, getCurrentUser, type AuthSession } from './services/auth.client';
+import { clearActiveScreen, clearSession, loadActiveScreen, loadSession, saveActiveScreen, saveSession } from './services/auth.storage';
+import { colors } from './theme';
+
+const appFonts = {
+  Manrope_700Bold: require('@expo-google-fonts/manrope/700Bold/Manrope_700Bold.ttf'),
+  Inter_400Regular: require('@expo-google-fonts/inter/400Regular/Inter_400Regular.ttf'),
+  Inter_600SemiBold: require('@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.ttf'),
+  Inter_700Bold: require('@expo-google-fonts/inter/700Bold/Inter_700Bold.ttf'),
+  IBMPlexMono_400Regular: require('@expo-google-fonts/ibm-plex-mono/400Regular/IBMPlexMono_400Regular.ttf')
+};
+
+const validScreens: ScreenKey[] = ['dashboard', 'sales', 'inventory', 'contacts', 'purchases', 'finance', 'projects', 'team', 'activity', 'reports', 'profile'];
+
+export default function App() {
+  const { height } = useWindowDimensions();
+  const [fontsLoaded, fontError] = useFonts(appFonts);
+  const [active, setActive] = useState<ScreenKey>('dashboard');
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [apiOnline, setApiOnline] = useState<boolean | null>(null);
+  const [session, setSession] = useState<AuthSession | null>(null);
+  const [sessionReady, setSessionReady] = useState(false);
+  const publicStoreTenant = Platform.OS === 'web' && typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('store') : null;
+
+  useKeyboardShortcuts(() => setPaletteOpen(true));
+
+  useEffect(() => {
+    let mounted = true;
+    pingApi().then((online) => {
+      if (mounted) setApiOnline(online);
+    });
+    return () => { mounted = false; };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    Promise.all([loadSession(), loadActiveScreen()]).then(async ([stored, storedScreen]) => {
+      if (!mounted) return;
+      if (storedScreen && validScreens.includes(storedScreen as ScreenKey)) setActive(storedScreen as ScreenKey);
+      setSession(stored);
+      setSessionReady(true);
+      if (!stored) return;
+
+      try {
+        const user = await getCurrentUser(stored.token, stored.user.tenantId);
+        const refreshed = { ...stored, user };
+        await saveSession(refreshed);
+        if (mounted) setSession(refreshed);
+      } catch (cause) {
+        if (cause instanceof AuthApiError && cause.status === 401) {
+          await clearSession();
+          if (mounted) setSession(null);
+        }
+      }
+    });
+    return () => { mounted = false; };
+  }, []);
+
+  async function handleAuthenticated(nextSession: AuthSession) {
+    await saveSession(nextSession);
+    await saveActiveScreen('dashboard');
+    setSession(nextSession);
+    setActive('dashboard');
+  }
+
+  function handleNavigate(screen: ScreenKey) {
+    setActive(screen);
+    void saveActiveScreen(screen);
+  }
+
+  async function handleLogout() {
+    await clearSession();
+    await clearActiveScreen();
+    setSession(null);
+    setPaletteOpen(false);
+    setActive('dashboard');
+  }
+
+  const content = useMemo(() => {
+    if (!session) return null;
+    switch (active) {
+      case 'sales': return <SalesScreen session={session} />;
+      case 'inventory': return <InventoryScreen session={session} />;
+      case 'contacts': return <ContactsScreen session={session} />;
+      case 'purchases': return <PurchasesScreen session={session} />;
+      case 'finance': return <FinanceScreen session={session} />;
+      case 'projects': return <ProjectsScreen session={session} />;
+      case 'team': return <TeamScreen session={session} />;
+      case 'activity': return <ActivityScreen session={session} />;
+      case 'reports': return <ReportsScreen session={session} />;
+      case 'profile': return <ProfileScreen apiOnline={apiOnline} apiUrl={getApiBaseUrl()} user={session!.user} onLogout={handleLogout} />;
+      default: return <DashboardScreen session={session} />;
+    }
+  }, [active, apiOnline, session]);
+
+  if (fontError) {
+    return (
+      <View style={[styles.app, styles.loading]}>
+        <Text style={styles.fontError}>No fue posible cargar las tipografías de la aplicación.</Text>
+      </View>
+    );
+  }
+
+  if (!fontsLoaded) {
+    return (
+      <View style={[styles.app, styles.loading]}>
+        <ActivityIndicator accessibilityLabel="Cargando tipografías" color={colors.signature} />
+      </View>
+    );
+  }
+
+  if (publicStoreTenant && /^[0-9a-fA-F]{24}$/.test(publicStoreTenant)) {
+    return <StorefrontScreen tenantId={publicStoreTenant} />;
+  }
+
+  if (!sessionReady) {
+    return <View style={[styles.app, styles.loading]} />;
+  }
+
+  if (!session) {
+    return <AuthScreen onAuthenticated={handleAuthenticated} />;
+  }
+
+  return (
+    <View style={[styles.app, { minHeight: height }]}>
+      <AppShell
+        active={active}
+        apiOnline={apiOnline}
+        user={session.user}
+        onNavigate={handleNavigate}
+        onOpenCommands={() => setPaletteOpen(true)}
+      >
+        <ScreenTransition screenKey={active}>{content}</ScreenTransition>
+      </AppShell>
+      <CommandPalette
+        visible={paletteOpen}
+        roles={session.user.roles}
+        onClose={() => setPaletteOpen(false)}
+        onSelect={(screen) => {
+          handleNavigate(screen);
+          setPaletteOpen(false);
+        }}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  app: {
+    flex: 1,
+    backgroundColor: colors.background
+  },
+  loading: { minHeight: '100%', alignItems: 'center', justifyContent: 'center' },
+  fontError: { color: colors.text, fontSize: 14, textAlign: 'center', padding: 24 }
+});

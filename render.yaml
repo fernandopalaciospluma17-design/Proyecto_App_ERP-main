@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: nodara-erp-api
+    runtime: node
+    rootDir: .
+    buildCommand: corepack pnpm install --frozen-lockfile && corepack pnpm --filter @erp/contracts build && corepack pnpm --filter @erp/backend build
+    startCommand: node apps/backend/dist/src/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: PUBLIC_API_URL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: EMAIL_REPLY_TO
+        sync: false
+      - key: EMAIL_VERIFICATION_TTL_MINUTES
+        value: "30"

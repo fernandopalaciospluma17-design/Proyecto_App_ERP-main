@@ -1,0 +1,15 @@
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+.expo/
+coverage/
+.corepack-cache/
+.npm-cache/
+.pnpm-store/
+.turbo/
+**/.turbo/
