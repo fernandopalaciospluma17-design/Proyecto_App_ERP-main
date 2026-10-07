@@ -5,6 +5,7 @@ dist/
 .env
 .env.*
 !.env.example
+Proyecto_App_ERP-main.env
 *.tsbuildinfo
 .expo/
 coverage/
