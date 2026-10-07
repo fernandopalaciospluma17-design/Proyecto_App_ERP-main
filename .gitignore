@@ -14,3 +14,9 @@ coverage/
 .pnpm-store/
 .turbo/
 **/.turbo/
+
+# Android/Gradle generated files and local IDE settings
+.gradle/
+**/build/
+local.properties
+.idea/
