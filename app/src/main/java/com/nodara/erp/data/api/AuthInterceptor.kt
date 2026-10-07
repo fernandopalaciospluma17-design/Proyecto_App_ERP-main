@@ -11,23 +11,32 @@ class AuthInterceptor(
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
+        val path = originalRequest.url.encodedPath
+
+        val isPublicEndpoint = path.endsWith("/health") ||
+                path.contains("/auth/login") ||
+                path.contains("/auth/register") ||
+                path.contains("/auth/resend-verification")
+
         val requestBuilder = originalRequest.newBuilder()
 
-        val token = sessionManager.getToken()
-        val tenantId = sessionManager.getTenantId()
+        if (!isPublicEndpoint) {
+            val token = sessionManager.getToken()
+            val tenantId = sessionManager.getTenantId()
 
-        if (!token.isNullOrBlank()) {
-            requestBuilder.header("Authorization", "Bearer $token")
-        }
-        if (!tenantId.isNullOrBlank()) {
-            requestBuilder.header("X-Tenant-Id", tenantId)
-            requestBuilder.header("x-tenant-id", tenantId)
+            if (!token.isNullOrBlank()) {
+                requestBuilder.header("Authorization", "Bearer $token")
+            }
+            if (!tenantId.isNullOrBlank()) {
+                requestBuilder.header("X-Tenant-Id", tenantId)
+                requestBuilder.header("x-tenant-id", tenantId)
+            }
         }
 
         val request = requestBuilder.build()
         val response = chain.proceed(request)
 
-        if (response.code == 401 && !originalRequest.url.encodedPath.contains("/auth/login")) {
+        if (response.code == 401 && !isPublicEndpoint) {
             sessionManager.clearSession()
             onUnauthorized()
         }

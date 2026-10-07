@@ -4,8 +4,8 @@ import { TenantModel } from '../modules/auth/tenant.model.js';
 import { UserModel } from '../modules/auth/user.model.js';
 import { hashPassword, verifyPassword } from '../modules/auth/password.service.js';
 
-const email = 'admin@nodara.local';
-const name = 'Administrador de pruebas';
+const email = 'admin@nodara.local1';
+const name = 'Administrador';
 
 function isDuplicateKeyError(error: unknown): error is { code: number } {
   return typeof error === 'object' && error !== null && 'code' in error && error.code === 11000;

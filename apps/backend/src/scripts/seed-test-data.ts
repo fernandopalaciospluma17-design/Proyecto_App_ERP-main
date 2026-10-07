@@ -10,6 +10,8 @@ import { InvoiceModel } from '../modules/sales/invoice.model.js';
 import { PurchaseModel } from '../modules/purchases/purchase.model.js';
 import { ProjectModel } from '../modules/projects/project.model.js';
 import { CashMovementModel } from '../modules/finance/cash-movement.model.js';
+import dns from 'node:dns';
+dns.setServers(['1.1.1.1', '8.8.8.8']);
 
 /*
  * ============================================================

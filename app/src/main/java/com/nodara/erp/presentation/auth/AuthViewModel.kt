@@ -2,6 +2,7 @@ package com.nodara.erp.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.JsonParser
 import com.nodara.erp.data.repository.AuthRepository
 import com.nodara.erp.domain.model.ResourceState
 import com.nodara.erp.domain.model.User
@@ -33,7 +34,8 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
                     _loginState.value = ResourceState.Success(user)
                 }
                 .onFailure { error ->
-                    _loginState.value = ResourceState.Error(error.message ?: "Error al iniciar sesión")
+                    val rawMsg = error.message ?: "Error al iniciar sesión"
+                    _loginState.value = ResourceState.Error(extractErrorMessage(rawMsg))
                 }
         }
     }
@@ -50,7 +52,8 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
                     _registerState.value = ResourceState.Success(msg)
                 }
                 .onFailure { error ->
-                    _registerState.value = ResourceState.Error(error.message ?: "Error al registrar cuenta")
+                    val rawMsg = error.message ?: "Error al registrar cuenta"
+                    _registerState.value = ResourceState.Error(extractErrorMessage(rawMsg))
                 }
         }
     }
@@ -67,7 +70,8 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
                     _resendState.value = ResourceState.Success(msg)
                 }
                 .onFailure { error ->
-                    _resendState.value = ResourceState.Error(error.message ?: "Error al reenviar correo")
+                    val rawMsg = error.message ?: "Error al reenviar correo"
+                    _resendState.value = ResourceState.Error(extractErrorMessage(rawMsg))
                 }
         }
     }
@@ -76,5 +80,19 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
         _loginState.value = ResourceState.Idle
         _registerState.value = ResourceState.Idle
         _resendState.value = ResourceState.Idle
+    }
+
+    private fun extractErrorMessage(rawMsg: String): String {
+        if (rawMsg.contains("\"error\":")) {
+            return try {
+                val json = JsonParser.parseString(rawMsg).asJsonObject
+                if (json.has("error") && !json.get("error").isJsonNull) {
+                    json.get("error").asString
+                } else rawMsg
+            } catch (e: Exception) {
+                rawMsg
+            }
+        }
+        return rawMsg
     }
 }

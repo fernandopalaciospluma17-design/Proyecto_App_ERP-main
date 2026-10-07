@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -56,6 +56,8 @@ fun NodaraNavigation(
     val sessionManager = remember { NodaraApp.instance.sessionManager }
     val isLoggedIn = remember { sessionManager.isLoggedIn() }
 
+    val startDestination = if (isLoggedIn) Screen.Dashboard.route else Screen.Login.route
+
     val apiService = remember {
         RetrofitClient.getApiService(sessionManager, onUnauthorized = {
             navController.navigate(Screen.Login.route) {
@@ -76,46 +78,19 @@ fun NodaraNavigation(
     val activityRepo = remember { ActivityRepository(apiService) }
     val reportsRepo = remember { ReportsRepository(apiService) }
 
-    val startDestination = if (isLoggedIn) Screen.Dashboard.route else Screen.Login.route
-
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val currentRoute = navBackStackEntry?.destination?.route ?: startDestination
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     val isAuthRoute = currentRoute == Screen.Login.route || currentRoute == Screen.Register.route
 
-    if (isAuthRoute) {
-        NavHost(navController = navController, startDestination = startDestination) {
-            composable(Screen.Login.route) {
-                val vm = remember { AuthViewModel(authRepo) }
-                LoginScreen(
-                    viewModel = vm,
-                    onLoginSuccess = {
-                        navController.navigate(Screen.Dashboard.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    },
-                    onNavigateToRegister = {
-                        navController.navigate(Screen.Register.route)
-                    }
-                )
-            }
-            composable(Screen.Register.route) {
-                val vm = remember { AuthViewModel(authRepo) }
-                RegisterScreen(
-                    viewModel = vm,
-                    onNavigateToLogin = {
-                        navController.popBackStack()
-                    }
-                )
-            }
-        }
-    } else {
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
+    ModalNavigationDrawer(
+        gesturesEnabled = !isAuthRoute,
+        drawerState = drawerState,
+        drawerContent = {
+            if (!isAuthRoute) {
                 ModalDrawerSheet(
                     drawerContainerColor = NodaraInk,
                     drawerContentColor = NodaraMist
@@ -176,7 +151,7 @@ fun NodaraNavigation(
                     HorizontalDivider(color = NodaraLine.copy(alpha = 0.2f))
                     NavigationDrawerItem(
                         label = { Text("Cerrar Sesión", color = NodaraDanger) },
-                        icon = { Icon(Icons.Default.ExitToApp, contentDescription = null, tint = NodaraDanger) },
+                        icon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null, tint = NodaraDanger) },
                         selected = false,
                         onClick = {
                             scope.launch { drawerState.close() }
@@ -189,82 +164,107 @@ fun NodaraNavigation(
                     )
                 }
             }
-        ) {
-            Scaffold(
-                topBar = {
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                if (!isAuthRoute) {
                     val activeScreen = Screen.drawerScreens.find { it.route == currentRoute }
                     NodaraTopBar(
                         title = activeScreen?.title ?: "Nodara ERP",
                         onOpenDrawer = { scope.launch { drawerState.open() } }
                     )
                 }
-            ) { innerPadding ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                ) {
-                    NavHost(navController = navController, startDestination = startDestination) {
-                        composable(Screen.Dashboard.route) {
-                            val vm = remember { DashboardViewModel(dashboardRepo) }
-                            DashboardScreen(
-                                viewModel = vm,
-                                onNavigateToModule = { route ->
-                                    navController.navigate(route) {
-                                        popUpTo(Screen.Dashboard.route) { saveState = true }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
+            }
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .then(if (!isAuthRoute) Modifier.padding(innerPadding) else Modifier)
+            ) {
+                NavHost(navController = navController, startDestination = startDestination) {
+                    composable(Screen.Login.route) {
+                        val vm = remember { AuthViewModel(authRepo) }
+                        LoginScreen(
+                            viewModel = vm,
+                            onLoginSuccess = {
+                                navController.navigate(Screen.Dashboard.route) {
+                                    popUpTo(0) { inclusive = true }
                                 }
-                            )
-                        }
-                        composable(Screen.Inventory.route) {
-                            val vm = remember { InventoryViewModel(inventoryRepo) }
-                            InventoryScreen(viewModel = vm)
-                        }
-                        composable(Screen.Sales.route) {
-                            val vm = remember { SalesViewModel(salesRepo, inventoryRepo, contactsRepo) }
-                            SalesScreen(viewModel = vm)
-                        }
-                        composable(Screen.Contacts.route) {
-                            val vm = remember { ContactsViewModel(contactsRepo) }
-                            ContactsScreen(viewModel = vm)
-                        }
-                        composable(Screen.Purchases.route) {
-                            val vm = remember { PurchasesViewModel(purchasesRepo, inventoryRepo, contactsRepo) }
-                            PurchasesScreen(viewModel = vm)
-                        }
-                        composable(Screen.Finance.route) {
-                            val vm = remember { FinanceViewModel(financeRepo) }
-                            FinanceScreen(viewModel = vm)
-                        }
-                        composable(Screen.Projects.route) {
-                            val vm = remember { ProjectsViewModel(projectsRepo) }
-                            ProjectsScreen(viewModel = vm)
-                        }
-                        composable(Screen.Team.route) {
-                            val vm = remember { TeamViewModel(teamRepo) }
-                            TeamScreen(viewModel = vm)
-                        }
-                        composable(Screen.Activity.route) {
-                            val vm = remember { ActivityViewModel(activityRepo) }
-                            ActivityScreen(viewModel = vm)
-                        }
-                        composable(Screen.Reports.route) {
-                            val vm = remember { ReportsViewModel(reportsRepo) }
-                            ReportsScreen(viewModel = vm)
-                        }
-                        composable(Screen.Profile.route) {
-                            val vm = remember { ProfileViewModel(authRepo, reportsRepo) }
-                            ProfileScreen(
-                                viewModel = vm,
-                                onLogout = {
-                                    navController.navigate(Screen.Login.route) {
-                                        popUpTo(0) { inclusive = true }
-                                    }
+                            },
+                            onNavigateToRegister = {
+                                navController.navigate(Screen.Register.route)
+                            }
+                        )
+                    }
+                    composable(Screen.Register.route) {
+                        val vm = remember { AuthViewModel(authRepo) }
+                        RegisterScreen(
+                            viewModel = vm,
+                            onNavigateToLogin = {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
+                    composable(Screen.Dashboard.route) {
+                        val vm = remember { DashboardViewModel(dashboardRepo) }
+                        DashboardScreen(
+                            viewModel = vm,
+                            onNavigateToModule = { route ->
+                                navController.navigate(route) {
+                                    popUpTo(Screen.Dashboard.route) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                            )
-                        }
+                            }
+                        )
+                    }
+                    composable(Screen.Inventory.route) {
+                        val vm = remember { InventoryViewModel(inventoryRepo) }
+                        InventoryScreen(viewModel = vm)
+                    }
+                    composable(Screen.Sales.route) {
+                        val vm = remember { SalesViewModel(salesRepo, inventoryRepo, contactsRepo) }
+                        SalesScreen(viewModel = vm)
+                    }
+                    composable(Screen.Contacts.route) {
+                        val vm = remember { ContactsViewModel(contactsRepo) }
+                        ContactsScreen(viewModel = vm)
+                    }
+                    composable(Screen.Purchases.route) {
+                        val vm = remember { PurchasesViewModel(purchasesRepo, inventoryRepo, contactsRepo) }
+                        PurchasesScreen(viewModel = vm)
+                    }
+                    composable(Screen.Finance.route) {
+                        val vm = remember { FinanceViewModel(financeRepo) }
+                        FinanceScreen(viewModel = vm)
+                    }
+                    composable(Screen.Projects.route) {
+                        val vm = remember { ProjectsViewModel(projectsRepo) }
+                        ProjectsScreen(viewModel = vm)
+                    }
+                    composable(Screen.Team.route) {
+                        val vm = remember { TeamViewModel(teamRepo) }
+                        TeamScreen(viewModel = vm)
+                    }
+                    composable(Screen.Activity.route) {
+                        val vm = remember { ActivityViewModel(activityRepo) }
+                        ActivityScreen(viewModel = vm)
+                    }
+                    composable(Screen.Reports.route) {
+                        val vm = remember { ReportsViewModel(reportsRepo) }
+                        ReportsScreen(viewModel = vm)
+                    }
+                    composable(Screen.Profile.route) {
+                        val vm = remember { ProfileViewModel(authRepo, reportsRepo) }
+                        ProfileScreen(
+                            viewModel = vm,
+                            onLogout = {
+                                navController.navigate(Screen.Login.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            }
+                        )
                     }
                 }
             }
