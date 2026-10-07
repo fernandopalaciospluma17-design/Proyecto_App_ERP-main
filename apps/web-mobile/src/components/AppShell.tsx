@@ -55,8 +55,6 @@ export function AppShell({
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.ambientTop} />
-      <View style={styles.ambientSide} />
       <View style={styles.shell}>
         {desktop ? (
           <View style={styles.sidebar}>
@@ -77,13 +75,8 @@ export function AppShell({
         <View style={styles.main}>
           <View style={[styles.topbar, !desktop && styles.topbarMobile]}>
             <View style={styles.topbarRow}>
-              {desktop ? (
-                <View style={styles.sectionContext}>
-                  <Text style={styles.sectionEyebrow}>NODARA ERP</Text>
-                  <Text numberOfLines={1} style={styles.sectionTitle}>{activeLabel}</Text>
-                </View>
-              ) : <Brand compact tone="light" />}
-              {desktop ? <SearchField /> : null}
+              {!desktop ? <Brand compact tone="light" /> : null}  
+
               <View style={styles.topActions}>
                 {desktop ? (
                   <>

@@ -48,28 +48,6 @@ export function DashboardScreen({ session }: { session: AuthSession }) {
     <ScrollView contentContainerStyle={screenStyles.content} showsVerticalScrollIndicator={false}>
       <ScreenHeading eyebrow="RESUMEN GENERAL" title={`Hola, ${firstName}`} subtitle="Información real de ventas, inventario y contactos de tu empresa." action="Actualizar" onAction={() => void load()} />
       <Feedback loading={loading} error={error} />
-      <Card style={styles.actionCard}>
-        <View style={styles.actionCopy}><Text style={styles.actionTitle}>Datos y exportaciones</Text><Text style={styles.actionDetail}>Carga un catálogo inicial sin duplicados o descarga toda la información de tu empresa.</Text></View>
-        <View style={screenStyles.actions}>
-          <MiniButton label="Cargar datos iniciales" disabled={actionBusy} onPress={() => void loadSamples()} />
-          <MiniButton label="Exportar PDF" disabled={actionBusy} onPress={() => void exportData('pdf')} />
-          <MiniButton label="Exportar Excel" disabled={actionBusy} onPress={() => void exportData('xlsx')} />
-        </View>
-      </Card>
-      {Platform.OS === 'web' ? <Card style={styles.actionCard}>
-        <View style={styles.actionCopy}>
-          <Text style={styles.actionTitle}>Página pública para clientes</Text>
-          <Text style={styles.actionDetail}>Es independiente del ERP. Tus clientes pueden ver imágenes, consultar existencias, agregar productos al carrito y enviarte pedidos.</Text>
-          <Text selectable style={styles.publicUrl}>{customerPageUrl}</Text>
-        </View>
-        <MiniButton label="Abrir página de clientes" onPress={() => void Linking.openURL(customerPageUrl)} />
-      </Card> : null}
-      {data && (data.products < 1000 || data.customers < 1000) ? (
-        <Card style={styles.missingCard}>
-          <View style={styles.actionCopy}><Text style={styles.missingTitle}>La base todavía no está completa</Text><Text style={styles.actionDetail}>Actualmente hay {data.products} productos y {data.customers} clientes. Completa los 1,000 de cada uno sin duplicar los existentes.</Text></View>
-          <MiniButton label="Completar 1,000 + 1,000" disabled={actionBusy} tone="success" onPress={() => void loadSamples()} />
-        </Card>
-      ) : null}
       {actionMessage ? <Feedback empty={actionMessage} /> : null}
       {loading && !data ? (
         <View style={screenStyles.grid}>
@@ -89,8 +67,8 @@ export function DashboardScreen({ session }: { session: AuthSession }) {
           <View style={screenStyles.grid}>
             <MetricCard label="Ventas del mes" value={money(data.salesThisMonth)} delta={`${data.invoicesThisMonth} facturas`} icon="↗" tone="success" />
             <MetricCard label="Por cobrar" value={money(data.receivables)} delta={`${data.pendingInvoices} pendientes`} icon="$" tone="warning" />
-            <MetricCard label="Valor de inventario" value={money(data.inventoryValue)} delta={`${data.products} productos`} icon="□" />
-            <MetricCard label="Contactos" value={`${data.customers + data.suppliers}`} delta={`${data.customers} clientes`} icon="○" />
+            <MetricCard label="Valor de inventario" value={money(data.inventoryValue)} delta={`${data.products} productos`} icon="⊞" />
+            <MetricCard label="Contactos" value={`${data.customers + data.suppliers}`} delta={`${data.customers} clientes`} icon="♙" />
           </View>
           <View style={screenStyles.grid}>
             <Card style={styles.summaryCard}>

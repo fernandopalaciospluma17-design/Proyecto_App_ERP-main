@@ -97,16 +97,18 @@ export function AuthScreen({ onAuthenticated }: { onAuthenticated: (session: Aut
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.root}>
+      <View style={styles.ambientTop} />
+      <View style={styles.ambientBottom} />
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <View style={[styles.layout, compact && styles.layoutCompact]}>
           {!compact ? (
             <View style={styles.intro}>
               <Brand />
-              <Text style={styles.kicker}>GESTIÓN EMPRESARIAL SEGURA</Text>
-              <Text style={styles.heroTitle}>Tu operación, conectada en una sola órbita.</Text>
-              <Text style={styles.heroCopy}>Ventas, inventario y contactos con acceso protegido y confirmación de correo.</Text>
-              <View style={styles.trustRow}><Text style={styles.trustGlyph}>✓</Text><Text style={styles.trustText}>Sesión cifrada en Android</Text></View>
-              <View style={styles.trustRow}><Text style={styles.trustGlyph}>✓</Text><Text style={styles.trustText}>La misma cuenta funciona en web</Text></View>
+              <Text style={styles.kicker}>ERP empresarial conectado</Text>
+              <Text style={styles.heroTitle}>Operaciones claras. Decisiones que avanzan.</Text>
+              <Text style={styles.heroCopy}>Nodara reúne procesos, equipos y datos en un sistema empresarial preciso, humano y preparado para crecer.</Text>
+              <View style={styles.trustRow}><Text style={styles.trustGlyph}>✓</Text><Text style={styles.trustText}>Tu Informacion Segura Siempre</Text></View>
+              <View style={styles.trustRow}><Text style={styles.trustGlyph}>✓</Text><Text style={styles.trustText}>Todo en un solo lugar</Text></View>
             </View>
           ) : null}
 

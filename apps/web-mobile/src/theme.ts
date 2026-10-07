@@ -15,7 +15,7 @@ export const colors = {
   sidebarMuted: '#C4CEC7',
   sidebarDim: '#A5B2A9',
   sidebarBorder: 'rgba(244, 245, 241, 0.16)',
-  background: '#F4F5F1',
+  background: '#18201F',
   backgroundSoft: '#EDF0EA',
   surface: '#FFFFFF',
   card: '#FFFFFF',
